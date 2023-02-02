@@ -43,7 +43,7 @@ public class PlayerJump : MonoBehaviour
         _rb2d = GetComponent<Rigidbody2D>();
         _playerGroundedManager = GetComponent<PlayerGroundedManager>();
 
-        var gravityScale = 2 * _maxGroundJumpHeight / _timeToReachGroundJumpApexInSeconds * _timeToReachGroundJumpApexInSeconds;
+        var gravityScale = 2 * _maxGroundJumpHeight / (_timeToReachGroundJumpApexInSeconds * _timeToReachGroundJumpApexInSeconds);
         _rb2d.gravityScale = gravityScale;
         
         _groundJumpVelocity = Mathf.Sqrt(2 * gravityScale * _maxGroundJumpHeight);
@@ -51,6 +51,10 @@ public class PlayerJump : MonoBehaviour
 
         _doubleJumpVelocity = Mathf.Sqrt(2 * gravityScale * _maxDoubleJumpHeight);
         _terminatedDoubleJumpVelocity = Mathf.Sqrt(_doubleJumpVelocity * _doubleJumpVelocity + 2 * -gravityScale * (_maxDoubleJumpHeight - _minDoubleJumpHeight));
+        
+        Debug.Log(gravityScale);
+        Debug.Log(_groundJumpVelocity);
+        Debug.Log(_terminatedGroundJumpVelocity);
     }
 
     public void JumpViaInput(InputAction.CallbackContext context)
@@ -59,7 +63,9 @@ public class PlayerJump : MonoBehaviour
         {
             if (_canGroundJump)
             {
-                _rb2d.velocity = new Vector2(_rb2d.velocity.x, _groundJumpVelocity);
+                var jumpImpulseForce = _rb2d.mass * (_groundJumpVelocity / Time.fixedDeltaTime);
+                
+                _rb2d.AddForce(jumpImpulseForce * transform.TransformDirection(Vector3.up));
                 _hasCoyoteTime = false;
                 if(_coyoteTimeCoroutine != null) StopCoroutine(_coyoteTimeCoroutine);
             }
