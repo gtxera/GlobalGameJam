@@ -5,7 +5,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
-[RequireComponent(typeof(Rigidbody2D))] [RequireComponent(typeof(PlayerGroundedManager))]
+[RequireComponent(typeof(Rigidbody2D))] 
+[RequireComponent(typeof(PlayerGroundedManager))]
+[RequireComponent(typeof(PlayerWallInteraction))]
 public class PlayerJump : MonoBehaviour
 {
     [Header("Ground Jump")] 
@@ -17,17 +19,24 @@ public class PlayerJump : MonoBehaviour
     [SerializeField] private float _maxDoubleJumpHeight;
     [SerializeField] private float _minDoubleJumpHeight;
 
+    [Header("Wall Jump")]
+    [SerializeField] private float _maxWallJumpHeight;
+    [SerializeField] private float _minWallJumpHeight;
+
     [Header("Balancing")] 
     [SerializeField] private float _coyoteTimeInFrames;
     [SerializeField] private int _inputGraceTimeInFrames;
 
     private Rigidbody2D _rb2d;
     private PlayerGroundedManager _playerGroundedManager;
+    private PlayerWallInteraction _playerWallInteraction;
 
     private float _groundJumpVelocity;
     private float _doubleJumpVelocity;
+    private float _wallJumpVelocity;
     private float _terminatedGroundJumpVelocity;
     private float _terminatedDoubleJumpVelocity;
+    private float _terminatedWallJumpVelocity;
 
     private Coroutine _coyoteTimeCoroutine;
     private bool _coyoteTimeExpired;
@@ -35,13 +44,16 @@ public class PlayerJump : MonoBehaviour
 
     private bool _groundJumpTerminated;
     private bool _doubleJumpTerminated;
+    private bool _wallJumpTerminated;
     private bool _canGroundJump;
     private bool _canDoubleJump;
+    private bool _canWallJump;
 
     private void Start()
     {
         _rb2d = GetComponent<Rigidbody2D>();
         _playerGroundedManager = GetComponent<PlayerGroundedManager>();
+        _playerWallInteraction = GetComponent<PlayerWallInteraction>();
 
         var gravityScale = 2 * _maxGroundJumpHeight / (_timeToReachGroundJumpApexInSeconds * _timeToReachGroundJumpApexInSeconds);
         _rb2d.gravityScale = gravityScale;
@@ -51,22 +63,27 @@ public class PlayerJump : MonoBehaviour
 
         _doubleJumpVelocity = Mathf.Sqrt(2 * gravityScale * _maxDoubleJumpHeight);
         _terminatedDoubleJumpVelocity = Mathf.Sqrt(_doubleJumpVelocity * _doubleJumpVelocity + 2 * -gravityScale * (_maxDoubleJumpHeight - _minDoubleJumpHeight));
-        
-        Debug.Log(gravityScale);
-        Debug.Log(_groundJumpVelocity);
-        Debug.Log(_terminatedGroundJumpVelocity);
+
+        _wallJumpVelocity = Mathf.Sqrt(2 * gravityScale * _maxWallJumpHeight);
+        _terminatedWallJumpVelocity = Mathf.Sqrt(_wallJumpVelocity * _wallJumpVelocity + 2 * -gravityScale * (_maxWallJumpHeight - _minWallJumpHeight));
     }
 
     public void JumpViaInput(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            if (_canGroundJump)
+            if (_canWallJump)
             {
-                var jumpImpulseForce = _rb2d.mass * (_groundJumpVelocity / Time.fixedDeltaTime);
-                
-                _rb2d.AddForce(jumpImpulseForce * transform.TransformDirection(Vector3.up));
+                _rb2d.velocity = new Vector2(_rb2d.velocity.x, _wallJumpVelocity);
                 _hasCoyoteTime = false;
+                _canGroundJump = false;
+            }
+
+            else if (_canGroundJump)
+            {
+                _rb2d.velocity = new Vector2(_rb2d.velocity.x, _groundJumpVelocity);
+                _hasCoyoteTime = false;
+                _canGroundJump = false;
                 if(_coyoteTimeCoroutine != null) StopCoroutine(_coyoteTimeCoroutine);
             }
             
@@ -118,18 +135,24 @@ public class PlayerJump : MonoBehaviour
 
     private void FixedUpdate()
     {
+        HandleGroundDetectionAndCoyoteTime();
+        HandleWallDetection();
+    }
+
+    private void HandleGroundDetectionAndCoyoteTime()
+    {
         if (_playerGroundedManager.IsGrounded)
         {
             _groundJumpTerminated = false;
             _doubleJumpTerminated = false;
-            
+
             _canGroundJump = true;
             _canDoubleJump = true;
-            
+
             _coyoteTimeExpired = false;
             _hasCoyoteTime = true;
         }
-        
+
         else
         {
             if (_coyoteTimeCoroutine == null && !_coyoteTimeExpired && _hasCoyoteTime)
@@ -137,11 +160,22 @@ public class PlayerJump : MonoBehaviour
                 _coyoteTimeCoroutine = StartCoroutine(CoyoteTime());
             }
 
-            else
+            if (_coyoteTimeExpired)
             {
                 _canGroundJump = false;
             }
         }
+    }
+
+    private void HandleWallDetection()
+    {
+        if (_playerWallInteraction.IsCollidingWithWall && !_playerGroundedManager.IsGrounded)
+        {
+            _canWallJump = true;
+            return;
+        }
+
+        _canWallJump = false;
     }
 
     private IEnumerator CoyoteTime()
@@ -153,5 +187,7 @@ public class PlayerJump : MonoBehaviour
 
         _canGroundJump = false;
         _coyoteTimeExpired = true;
+
+        _coyoteTimeCoroutine = null;
     }
 }
