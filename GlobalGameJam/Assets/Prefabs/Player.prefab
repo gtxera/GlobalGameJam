@@ -1,5 +1,77 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2689433556539301722
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4415083047220927043}
+  - component: {fileID: 5303915960259832370}
+  - component: {fileID: 2913929554811434522}
+  m_Layer: 2
+  m_Name: PlayerAttack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4415083047220927043
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2689433556539301722}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2767332159449414590}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5303915960259832370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2689433556539301722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5899ec672a6a3a4f9854bd008a0c72e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackDamage: 1
+--- !u!61 &2913929554811434522
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2689433556539301722}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.559057, y: -0.08176708}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.58926535, y: 0.13669395}
+  m_EdgeRadius: 0
 --- !u!1 &2767332159449414583
 GameObject:
   m_ObjectHideFlags: 0
@@ -17,6 +89,7 @@ GameObject:
   - component: {fileID: 2767332159449414580}
   - component: {fileID: 2767332159449414581}
   - component: {fileID: 2767332159449414582}
+  - component: {fileID: -2035474709181351773}
   m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
@@ -35,7 +108,8 @@ Transform:
   m_LocalPosition: {x: -8.51, y: -2.51, z: -0.03170571}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4415083047220927043}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -240,10 +314,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 459d6a10b1f7f5a45bc455f45a8c8a0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxGroundJumpHeight: 2.2
+  _maxGroundJumpHeight: 3.3
   _minGroundJumpHeight: 0.2
-  _timeToReachGroundJumpApexInSeconds: 0.44
-  _maxDoubleJumpHeight: 1.1
+  _timeToReachGroundJumpApexInSeconds: 0.5
+  _maxDoubleJumpHeight: 2.2
   _minDoubleJumpHeight: 0.2
   _maxWallJumpHeight: 2.2
   _minWallJumpHeight: 0.2
@@ -277,7 +351,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a987f122a598b64e8fe28b8d6d47e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxMovementSpeed: 2
+  _maxMovementSpeed: 3
   _timeToAccelerateInFrames: 5
   _timeToDecelerateInFrames: 5
   _wallJumpLockTimeInFrames: 5
+--- !u!114 &-2035474709181351773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2767332159449414583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6921080df1b68e7419a961d8de4bc8e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 10
+  _onDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  _onDamage:
+    m_PersistentCalls:
+      m_Calls: []
