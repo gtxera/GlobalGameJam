@@ -5,19 +5,13 @@ using UnityEngine;
 public class EnemyPathfinder : MonoBehaviour
 {
     [SerializeField] private List<Transform> _pathTransforms;
-    public List<Vector2> PathPoints = new List<Vector2>();
+    public List<Vector2> PathPoints { get; private set; }
     
     void Start()
     {
         foreach (var pathTransform in _pathTransforms)
         {
-            
+            PathPoints.Add(pathTransform.position);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
